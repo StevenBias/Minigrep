@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::process;
 use std::env;
 use std::fs;
@@ -13,10 +14,8 @@ fn main() {
     println!("Searching for {}", config.query);
     println!("In file {}", config.filename);
 
-    let content = fs::read_to_string(config.filename)
-        .expect("Error while reading file");
+    run(config).expect("Error while reading file");
 
-    println!("With text:\n{}", content);
 }
 
 struct Config {
@@ -32,4 +31,11 @@ impl Config {
             return Err("There are not enough arguments")
         }
     }
+}
+
+// dyn Error => Dynamix error to not avoid to declare the type of error
+fn run(config: Config) -> Result<(), Box<dyn Error>>{
+    let content = fs::read_to_string(config.filename)?;
+    println!("With text:\n{}", content);
+    Ok(())
 }
