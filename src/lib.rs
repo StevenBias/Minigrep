@@ -1,3 +1,4 @@
+use std::env;
 use std::error::Error;
 use std::fs;
 
@@ -11,7 +12,8 @@ pub struct Config {
 impl Config {
     pub fn new(args: &[String]) -> Result<Config, &'static str> {
         if args.len() > 2 {
-            Ok(Config { query: args[1].clone(), filename: args[2].clone() })
+            let case_sensitive = env::var("CASE_SENSITIVE").is_err();
+            Ok(Config { query: args[1].clone(), filename: args[2].clone(), case_insensitive: case_sensitive })
         } else {
             return Err("There are not enough arguments")
         }
