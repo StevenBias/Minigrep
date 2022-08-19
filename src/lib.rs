@@ -6,14 +6,27 @@ use std::fs;
 pub struct Config {
     pub query: String,
     pub filename: String,
-    pub case_insensitive: bool,
+    pub case_sensitive: bool,
 }
 
 impl Config {
-    pub fn new(args: &[String]) -> Result<Config, &'static str> {
+    pub fn new(mut args: std::env::Args) -> Result<Config, &'static str> {
         if args.len() > 2 {
+            // The first arg is the prog name, ignore it!
+            args.next();
+
+            let query = match args.next() {
+                Some(q) => q,
+                None => return Err("Error on the query string"),
+            };
+            let filename = match args.next() {
+                Some(f) => f,
+                None => return Err("Error on the file name"),
+            };
+
             let case_sensitive = env::var("CASE_SENSITIVE").is_err();
-            Ok(Config { query: args[1].clone(), filename: args[2].clone(), case_insensitive: case_sensitive })
+
+            Ok(Config { query, filename, case_sensitive })
         } else {
             return Err("There are not enough arguments")
         }
@@ -24,7 +37,7 @@ impl Config {
 pub fn run(config: Config) -> Result<(), Box<dyn Error>>{
     let content = fs::read_to_string(config.filename)?;
 
-    let result = if config.case_insensitive {
+    let result = if config.case_sensitive {
         search_case_insensitive(&config.query, &content) 
     } else {
         search(&config.query, &content) 
