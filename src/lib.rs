@@ -20,6 +20,10 @@ impl Config {
 // dyn Error => Dynamix error to not avoid to declare the type of error
 pub fn run(config: Config) -> Result<(), Box<dyn Error>>{
     let content = fs::read_to_string(config.filename)?;
+
+    for line in search(&config.query, &content) {
+        println!("{}", line);
+    }
     Ok(())
 }
 
