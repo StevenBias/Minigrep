@@ -23,8 +23,16 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>>{
     Ok(())
 }
 
+// Use en explicit lifetime 'a to specify that this is the content argument lifetime
+// which is connected to the return Vec
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    vec![]
+    let mut res = Vec::new();
+    for line in contents.lines() {
+        if line.contains(query) {
+            res.push(line);
+        }
+    }
+    return res;
 }
 
 #[cfg(test)]
@@ -35,9 +43,9 @@ mod tests {
     fn one_result() {
         let query = "duct";
         let contents = "\
-                        Rust:
-                        safe, fast, productive.
-                        Pick three.";
+Rust:
+safe, fast, productive.
+Pick three.";
 
         assert_eq!(
             vec!["safe, fast, productive."],
